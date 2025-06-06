@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/2024-dissertation/openmvgo/internal/openmvg"
-	"github.com/2024-dissertation/openmvgo/internal/openmvs"
-	"github.com/2024-dissertation/openmvgo/internal/utils"
+	"github.com/2024-dissertation/openmvgo/pkg/openmvg"
+	"github.com/2024-dissertation/openmvgo/pkg/openmvs"
+	"github.com/2024-dissertation/openmvgo/pkg/utils"
 	"github.com/urfave/cli/v3"
 )
 

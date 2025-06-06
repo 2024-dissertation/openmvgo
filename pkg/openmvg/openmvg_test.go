@@ -3,8 +3,8 @@ package openmvg_test
 import (
 	"testing"
 
-	"github.com/2024-dissertation/openmvgo/internal/openmvg"
 	"github.com/2024-dissertation/openmvgo/mocks"
+	"github.com/2024-dissertation/openmvgo/pkg/openmvg"
 	"go.uber.org/mock/gomock"
 )
 
