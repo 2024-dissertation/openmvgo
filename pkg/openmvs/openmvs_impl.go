@@ -84,11 +84,11 @@ func (s OpenMVSServiceImpl) RunTextureMesh() {
 	}
 	s.Utils.CopyFile(
 		fmt.Sprintf("%s/scene_dense_mesh_refine_texture.mtl", s.Config.BuildDir),
-		fmt.Sprintf("%s/final.mtl", s.Config.OutputDir),
+		fmt.Sprintf("%s/scene_dense_mesh_refine_texture.mtl", s.Config.OutputDir),
 	)
 
 	s.Utils.CopyFile(
 		fmt.Sprintf("%s/scene_dense_mesh_refine_texture.obj", s.Config.BuildDir),
-		fmt.Sprintf("%s/final.obj", s.Config.OutputDir),
+		fmt.Sprintf("%s/scene_dense_mesh_refine_texture.obj", s.Config.OutputDir),
 	)
 }
