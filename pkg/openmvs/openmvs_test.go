@@ -14,7 +14,7 @@ func TestRunDensifyPointCloud_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -43,7 +43,7 @@ func TestRunDensifyPointCloud_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -82,7 +82,7 @@ func TestRunReconstructMesh_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -110,7 +110,7 @@ func TestRunReconstructMesh_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -148,7 +148,7 @@ func TestRunRefineMesh_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -178,7 +178,7 @@ func TestRunRefineMesh_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -218,7 +218,7 @@ func TestRunTextureMesh_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -263,7 +263,7 @@ func TestRunTextureMesh_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -318,7 +318,7 @@ func TestRunPipeline_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -345,7 +345,7 @@ func TestRunPipeline_Error(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := openmvs.OpenMVSConfig{
 		BuildDir:   "/path/to/build",
@@ -382,7 +382,7 @@ func TestNewOpenMVSService_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := &openmvs.OpenMVSConfig{
 		OutputDir:  "/path/to/output",
@@ -406,7 +406,7 @@ func TestNewOpenMVSService_FailOutputDir(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := &openmvs.OpenMVSConfig{
 		OutputDir:  "",
@@ -439,7 +439,7 @@ func TestNewOpenMVSService_FailEnsureDir(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	config := &openmvs.OpenMVSConfig{
 		OutputDir:  "/path/to/output",

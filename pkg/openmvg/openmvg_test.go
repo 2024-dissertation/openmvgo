@@ -12,7 +12,7 @@ func TestNewOpenMVGService(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -39,7 +39,7 @@ func TestRunSfMInitImageListing(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -73,7 +73,7 @@ func TestRunSfMComputeFeatures(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -104,7 +104,7 @@ func TestRunSfMComputeMatches(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -135,7 +135,7 @@ func TestRunSfMReconstruction(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -167,7 +167,7 @@ func TestRunSfMComputeSfMDataColor(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -197,7 +197,7 @@ func TestRunOpenMVG2OpenMVS(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -228,7 +228,7 @@ func TestRunHealthCheck(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
@@ -253,7 +253,7 @@ func TestSfMSequentialPipeline(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockUtils := mocks.NewMockUtilsInterface(ctrl)
+	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
 	mockUtils.EXPECT().EnsureDir(gomock.Any()).Return(nil).AnyTimes()
 
