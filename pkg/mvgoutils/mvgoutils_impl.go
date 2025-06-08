@@ -1,4 +1,4 @@
-package utils
+package mvgoutils
 
 import (
 	"fmt"
@@ -9,13 +9,13 @@ import (
 	"path/filepath"
 )
 
-type UtilsImpl struct{}
+type MvgoUtilsImpl struct{}
 
-func NewUtils() UtilsInterface {
-	return &UtilsImpl{}
+func NewMvgoUtils() OpenmvgoUtilsInterface {
+	return &MvgoUtilsImpl{}
 }
 
-func (u *UtilsImpl) Check(e error) {
+func (u *MvgoUtilsImpl) Check(e error) {
 	if e != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", e)
 		panic(e)
@@ -23,7 +23,7 @@ func (u *UtilsImpl) Check(e error) {
 }
 
 // RunCommand runs a command with arguments and prints its stdout/stderr in real-time.
-func (u *UtilsImpl) RunCommand(name string, args []string) error {
+func (u *MvgoUtilsImpl) RunCommand(name string, args []string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -37,7 +37,7 @@ func (u *UtilsImpl) RunCommand(name string, args []string) error {
 }
 
 // EnsureDir creates the directory (and parent dirs) if it doesn't exist.
-func (u *UtilsImpl) EnsureDir(path string) error {
+func (u *MvgoUtilsImpl) EnsureDir(path string) error {
 	abs, err := filepath.Abs(path)
 	if err != nil {
 		return fmt.Errorf("could not resolve absolute path: %w", err)
@@ -53,7 +53,7 @@ func (u *UtilsImpl) EnsureDir(path string) error {
 }
 
 // DownloadFile downloads a file from the given URL and saves it to a temporary file.
-func (u *UtilsImpl) DownloadFile(url string) (string, error) {
+func (u *MvgoUtilsImpl) DownloadFile(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("failed to download file from %s: %w", url, err)
@@ -80,7 +80,7 @@ func (u *UtilsImpl) DownloadFile(url string) (string, error) {
 	return out.Name(), nil
 }
 
-func (u *UtilsImpl) CopyFile(src, dst string) error {
+func (u *MvgoUtilsImpl) CopyFile(src, dst string) error {
 	fmt.Printf("→ Copying file from %s to %s\n", src, dst)
 	input, err := os.ReadFile(src)
 	if err != nil {

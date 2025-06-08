@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
+	mvgoutils "github.com/2024-dissertation/openmvgo/pkg/mvgoutils"
 	"github.com/2024-dissertation/openmvgo/pkg/openmvg"
 	"github.com/2024-dissertation/openmvgo/pkg/openmvs"
-	"github.com/2024-dissertation/openmvgo/pkg/utils"
 	"github.com/urfave/cli/v3"
 )
 
@@ -52,7 +52,7 @@ func main() {
 			fmt.Printf("Output Directory: %s\n", outputDir)
 
 			// Setup Utils
-			utils := utils.NewUtils()
+			utils := mvgoutils.NewMvgoUtils()
 
 			timestamp := time.Now().Unix()
 

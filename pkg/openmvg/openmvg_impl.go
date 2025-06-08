@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/2024-dissertation/openmvgo/pkg/utils"
+	"github.com/2024-dissertation/openmvgo/pkg/mvgoutils"
 )
 
 // Config for running the OpenMVG pipeline
@@ -27,11 +27,14 @@ func NewOpenMVGConfig(inputDir string, outputDir string, cameraDBFile *string) O
 }
 
 type AppFileServiceImpl struct {
-	Utils  utils.UtilsInterface
+	Utils  mvgoutils.OpenmvgoUtilsInterface
 	Config OpenMVGConfig
 }
 
-func NewOpenMVGService(config OpenMVGConfig, utils utils.UtilsInterface) AppFileServiceImpl {
+func NewOpenMVGService(config OpenMVGConfig, utils mvgoutils.OpenmvgoUtilsInterface) AppFileServiceImpl {
+	if utils == nil {
+		utils = mvgoutils.NewMvgoUtils()
+	}
 
 	// Pre run folder checks
 	if config.InputDir == "" || config.OutputDir == "" {

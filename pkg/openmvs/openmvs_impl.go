@@ -3,7 +3,7 @@ package openmvs
 import (
 	"fmt"
 
-	"github.com/2024-dissertation/openmvgo/pkg/utils"
+	"github.com/2024-dissertation/openmvgo/pkg/mvgoutils"
 )
 
 // Config object
@@ -24,12 +24,16 @@ func NewOpenMVSConfig(outputDir string, buildDir string, maxThreads int) *OpenMV
 
 // OpenMVSService interface implementation
 type OpenMVSServiceImpl struct {
-	Utils  utils.UtilsInterface
+	Utils  mvgoutils.OpenmvgoUtilsInterface
 	Config *OpenMVSConfig
 }
 
 // Helper function to create a new OpenMVSServiceImpl
-func NewOpenMVSService(config *OpenMVSConfig, utils utils.UtilsInterface) OpenMVSServiceImpl {
+func NewOpenMVSService(config *OpenMVSConfig, utils mvgoutils.OpenmvgoUtilsInterface) OpenMVSServiceImpl {
+	if utils == nil {
+		utils = mvgoutils.NewMvgoUtils()
+	}
+
 	if config.OutputDir == "" {
 		utils.Check(fmt.Errorf("input directory must be specified"))
 	}
