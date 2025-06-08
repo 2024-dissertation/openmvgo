@@ -245,14 +245,14 @@ func TestRunTextureMesh_Success(t *testing.T) {
 	mockUtils.EXPECT().
 		CopyFile(
 			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.mtl", config.BuildDir),
-			fmt.Sprintf("%s/final.mtl", config.OutputDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.mtl", config.OutputDir),
 		).
 		Return(nil)
 
 	mockUtils.EXPECT().
 		CopyFile(
 			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.obj", config.BuildDir),
-			fmt.Sprintf("%s/final.obj", config.OutputDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.obj", config.OutputDir),
 		).
 		Return(nil)
 
@@ -292,14 +292,14 @@ func TestRunTextureMesh_Error(t *testing.T) {
 	mockUtils.EXPECT().
 		CopyFile(
 			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.mtl", config.BuildDir),
-			fmt.Sprintf("%s/final.mtl", config.OutputDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.mtl", config.OutputDir),
 		).
 		Return(nil)
 
 	mockUtils.EXPECT().
 		CopyFile(
 			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.obj", config.BuildDir),
-			fmt.Sprintf("%s/final.obj", config.OutputDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture.obj", config.OutputDir),
 		).
 		Return(nil)
 
