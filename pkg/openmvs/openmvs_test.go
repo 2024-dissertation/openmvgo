@@ -256,6 +256,13 @@ func TestRunTextureMesh_Success(t *testing.T) {
 		).
 		Return(nil)
 
+	mockUtils.EXPECT().
+		CopyFile(
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.BuildDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.OutputDir),
+		).
+		Return(nil)
+
 	service.RunTextureMesh()
 }
 
@@ -304,6 +311,13 @@ func TestRunTextureMesh_Error(t *testing.T) {
 		Return(nil)
 
 	mockUtils.EXPECT().
+		CopyFile(
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.BuildDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.OutputDir),
+		).
+		Return(nil)
+
+	mockUtils.EXPECT().
 		Check(gomock.Any()).
 		Do(func(err error) {
 			if err == nil || err.Error() != fmt.Sprintf("failed to run TextureMesh: %v", expectedErr) {
@@ -338,6 +352,13 @@ func TestRunPipeline_Success(t *testing.T) {
 
 	mockUtils.EXPECT().CopyFile(gomock.Any(), gomock.Any()).Return(nil).Times(2)
 
+	mockUtils.EXPECT().
+		CopyFile(
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.BuildDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.OutputDir),
+		).
+		Return(nil)
+
 	service.RunPipeline()
 }
 
@@ -366,6 +387,13 @@ func TestRunPipeline_Error(t *testing.T) {
 	mockUtils.EXPECT().RunCommand("TextureMesh", gomock.Any()).Return(nil)
 
 	mockUtils.EXPECT().CopyFile(gomock.Any(), gomock.Any()).Return(nil).Times(2)
+
+	mockUtils.EXPECT().
+		CopyFile(
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.BuildDir),
+			fmt.Sprintf("%s/scene_dense_mesh_refine_texture_material_00_map_Kd.jpg", config.OutputDir),
+		).
+		Return(nil)
 
 	mockUtils.EXPECT().
 		Check(gomock.Any()).
