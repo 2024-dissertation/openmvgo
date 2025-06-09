@@ -3,8 +3,6 @@ package openmvs_test
 import (
 	"errors"
 	"fmt"
-	"os"
-	"strconv"
 	"testing"
 
 	"github.com/2024-dissertation/openmvgo/mocks"
@@ -414,20 +412,10 @@ func TestNewOpenMVSService_Success(t *testing.T) {
 
 	mockUtils := mocks.NewMockOpenmvgoUtilsInterface(ctrl)
 
-	maxThreads := os.Getenv("MAX_THREADS")
-	if maxThreads == "" {
-		maxThreads = "4"
-	}
-
-	maxThreadsInt, err := strconv.Atoi(maxThreads)
-	if err != nil {
-		maxThreadsInt = 4
-	}
-
 	config := &openmvs.OpenMVSConfig{
 		OutputDir:  "/path/to/output",
 		BuildDir:   "/path/to/build",
-		MaxThreads: maxThreadsInt,
+		MaxThreads: 4,
 	}
 
 	mockUtils.EXPECT().EnsureDir(config.OutputDir).Return(nil)
