@@ -34,3 +34,5 @@ cover.html
 vendor/
 
 main
+
+.env
