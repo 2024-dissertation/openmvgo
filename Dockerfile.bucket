@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev libpng-dev libtiff-dev libglu1-mesa-dev \
     libglew-dev libglfw3-dev coinor-libclp-dev libceres-dev \
     libcgal-dev libcgal-qt5-dev graphviz liblemon-dev \
-    pkg-config && \
+    pkg-config libc++1 libc++abi1 libstdc++6 && \
     rm -rf /var/lib/apt/lists/*
 
 # Build VCG library
@@ -27,6 +27,8 @@ RUN git clone --recursive --depth=1 https://github.com/openMVG/openMVG.git /open
     mkdir -p /openMVG_build && cd /openMVG_build && \
     cmake -DCMAKE_BUILD_TYPE=RELEASE \
     -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DOpenMVG_BUILD_EXAMPLES=OFF \
+    -DOpenMVG_USE_RERUN=OFF \
     /openMVG/src && \
     make -j$(nproc) && \
     make install
@@ -66,7 +68,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -ldflags='-w -s -extldflags "-static"' \
     -a -installsuffix cgo \
     -o openmvgo \
-    ./cmd/cli 
+    ./cmd/docker 
 
 # ------------------------------
 # Stage 3: Build Blender (minimal)
@@ -85,36 +87,29 @@ RUN wget -q https://download.blender.org/release/Blender4.4/blender-4.4.0-linux-
 # ------------------------------
 # Stage 4: Production Runtime
 # ------------------------------
-FROM alpine:3.22 AS final
+FROM ubuntu:22.04 AS final
 
 # Create non-root user
-RUN addgroup -S appuser && adduser -S appuser -G appuser
+RUN groupadd -r appuser && useradd -r -g appuser -s /bin/false appuser
 
-# Install only runtime dependencies and clean up in the same layer
-RUN apk add --no-cache \
-    boost-dev \
-    cgal \
-    curl \
-    glew \
-    glfw \
-    glu \
-    jpeg \
-    libgomp \
-    libpng \
-    libstdc++ \
-    mesa \
-    opencv \
-    tiff \
-    tzdata \
-    wget && \
-    # Clean up unnecessary files
-    rm -rf /var/cache/apk/*
+ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
-# Copy only necessary files from previous stages
-COPY --from=cv_builder /usr/local/bin/* /usr/local/bin/
-COPY --from=cv_builder /usr/local/lib/*.so* /usr/local/lib/
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcgal-qt5-dev libceres2 libboost-system1.74.0 libboost-filesystem1.74.0 \
+    libboost-program-options1.74.0 libboost-serialization1.74.0 \
+    libopencv-core4.5d libopencv-imgproc4.5d libopencv-imgcodecs4.5d \
+    libjpeg8 libpng16-16 libtiff5 libglu1-mesa libglew2.2 \
+    libglfw3 libgomp1 ca-certificates curl wget libboost-all-dev libopencv-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy only essential Blender files
+# Copy OpenMVG/OpenMVS binaries and libraries
+COPY --from=cv_builder /usr/local/bin/ /usr/local/bin/
+COPY --from=cv_builder /usr/local/lib/ /usr/local/lib/
+
+# Copy Blender (only essential parts)
+COPY --from=blender_builder /opt/blender/blender /usr/local/bin/blender
 COPY --from=blender_builder /opt/blender/4.4/ /opt/blender/4.4/
 
 # Copy Go application
@@ -122,19 +117,18 @@ COPY --from=go_builder /app/openmvgo /usr/local/bin/openmvgo
 
 WORKDIR /app
 
-# Copy only necessary scripts
 COPY ./scripts /app/scripts
 
 # Update library cache
-RUN ldconfig || true
+RUN ldconfig
 
 # Create app directory with proper permissions
-RUN mkdir -p /app/data /app/logs && \
+RUN mkdir -p /app /app/data /app/logs && \
     chown -R appuser:appuser /app && \
-    chown -R appuser:appuser /usr/local/bin
+    chown -R appuser:appuser /usr/local/bin 
 
 # Copy entrypoint script
-COPY --chown=appuser:appuser --chmod=0755 entrypoint.sh /app/entrypoint.sh
+COPY --chown=appuser:appuser entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # Set environment variables
@@ -147,6 +141,7 @@ ENV PATH="/usr/local/bin:/usr/local/bin/OpenMVS:$PATH" \
 # Switch to non-root user
 USER appuser
 
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:${PORT}/health || exit 1
@@ -156,4 +151,4 @@ EXPOSE 3333
 
 # Use proper entrypoint
 # ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["tail", "-f", "/dev/null"]
+CMD ["openmvgo"]

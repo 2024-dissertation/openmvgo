@@ -10,6 +10,7 @@ import (
 	mvgoutils "github.com/2024-dissertation/openmvgo/pkg/mvgoutils"
 	"github.com/2024-dissertation/openmvgo/pkg/openmvg"
 	"github.com/2024-dissertation/openmvgo/pkg/openmvs"
+	"github.com/2024-dissertation/openmvgo/pkg/services"
 	"github.com/urfave/cli/v3"
 )
 
@@ -18,6 +19,9 @@ func main() {
 	var outputDir string
 	var cameraDBFile string
 	var maxThreads int
+	var useBucket bool
+
+	storageService := services.NewKatapultStorageService()
 
 	cmd := &cli.Command{
 		Name:  "OpenMVGO",
@@ -27,6 +31,10 @@ func main() {
 				Name:        "maxThreads",
 				Value:       1,
 				Destination: &maxThreads,
+			},
+			&cli.BoolFlag{
+				Name:        "useBucket",
+				Destination: &useBucket,
 			},
 		},
 		Arguments: []cli.Argument{
@@ -46,6 +54,14 @@ func main() {
 		Action: func(context.Context, *cli.Command) error {
 			if inputDir == "" || outputDir == "" {
 				return cli.Exit("input and output directories must be specified", 1)
+			}
+
+			if useBucket {
+				s3InputDir, err := storageService.DownloadFolder(inputDir)
+				if err != nil {
+					return cli.Exit(fmt.Sprintf("Failed to download folder: %v", err), 1)
+				}
+				inputDir = s3InputDir
 			}
 
 			fmt.Printf("Input Directory: %s\n", inputDir)

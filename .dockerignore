@@ -14,6 +14,7 @@
 *.a
 *.out
 photogrammetry
+openmvgo
 
 # Ignore build folders
 bin/

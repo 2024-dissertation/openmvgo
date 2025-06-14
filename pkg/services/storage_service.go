@@ -1,0 +1,213 @@
+package services
+
+import (
+	"bytes"
+	"context"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+)
+
+type KatapultStorageService struct {
+	client     *s3.Client
+	bucketName string
+	region     string
+	endpoint   string
+	isDev      bool
+}
+
+func NewKatapultStorageService() *KatapultStorageService {
+	bucketName := os.Getenv("KATAPULT_BUCKET_NAME")
+	region := os.Getenv("KATAPULT_REGION")
+	endpoint := os.Getenv("KATAPULT_ENDPOINT")
+	accessKey := os.Getenv("KATAPULT_ACCESS_KEY")
+	secretKey := os.Getenv("KATAPULT_SECRET_KEY")
+	isDev := os.Getenv("APP_ENV") == "dev"
+
+	// Configure AWS SDK
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
+	)
+	if err != nil {
+		panic(fmt.Sprintf("unable to load SDK config, %v", err))
+	}
+
+	// Create S3 client with custom endpoint
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.BaseEndpoint = aws.String(endpoint)
+	})
+
+	return &KatapultStorageService{
+		client:     client,
+		bucketName: bucketName,
+		region:     region,
+		endpoint:   endpoint,
+		isDev:      isDev,
+	}
+}
+
+func (s *KatapultStorageService) getObjectKey(taskID uint, filename string, fileType string) string {
+	var path string
+	if fileType == "mesh" {
+		path = fmt.Sprintf("objects/%d/%s", taskID, filename)
+	} else {
+		path = fmt.Sprintf("uploads/%d/%s", taskID, filename)
+	}
+
+	if s.isDev {
+		return "development/" + path
+	}
+	return path
+}
+
+func (s *KatapultStorageService) getFilePath(filepath string) string {
+	if s.isDev && !strings.HasPrefix(filepath, "development/") {
+		return "development/" + filepath
+	}
+	return filepath
+}
+
+func (s *KatapultStorageService) UploadFile(file *multipart.FileHeader, taskID uint, fileType string) (string, error) {
+	src, err := file.Open()
+	if err != nil {
+		return "", fmt.Errorf("failed to open file: %w", err)
+	}
+	defer src.Close()
+
+	return s.UploadFromReader(src, taskID, file.Filename, fileType)
+}
+
+func (s *KatapultStorageService) UploadFromReader(reader io.Reader, taskID uint, filename string, fileType string) (string, error) {
+	// Read the entire file into memory
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, reader); err != nil {
+		return "", fmt.Errorf("failed to read file: %w", err)
+	}
+
+	objectKey := s.getObjectKey(taskID, filename, fileType)
+
+	// Upload to S3
+	_, err := s.client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(objectKey),
+		Body:   bytes.NewReader(buf.Bytes()),
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to upload file: %w", err)
+	}
+
+	return objectKey, nil
+}
+
+func (s *KatapultStorageService) GetFile(filepath string) (io.ReadCloser, error) {
+	// Get object from S3
+	result, err := s.client.GetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(s.getFilePath(filepath)),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file: %w", err)
+	}
+
+	return result.Body, nil
+}
+
+func (s *KatapultStorageService) DeleteFile(taskID uint, filename string) error {
+	objectKey := s.getObjectKey(taskID, filename, "")
+
+	// Delete object from S3
+	_, err := s.client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Bucket: aws.String(s.bucketName),
+		Key:    aws.String(objectKey),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete file: %w", err)
+	}
+
+	return nil
+}
+
+func (s *KatapultStorageService) DownloadFolder(folderPath string) (string, error) {
+	// Create a temporary directory
+	tmpDir, err := os.MkdirTemp("", "s3-download-*")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp directory: %w", err)
+	}
+
+	// List all objects in the folder
+	listInput := &s3.ListObjectsV2Input{
+		Bucket: aws.String(s.bucketName),
+		Prefix: aws.String(s.getFilePath(folderPath)),
+	}
+
+	paginator := s3.NewListObjectsV2Paginator(s.client, listInput)
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			os.RemoveAll(tmpDir) // Clean up on error
+			return "", fmt.Errorf("failed to list objects: %w", err)
+		}
+
+		for _, object := range page.Contents {
+			// Skip if it's the folder itself
+			if *object.Key == s.getFilePath(folderPath) {
+				continue
+			}
+
+			// Get the relative path within the folder
+			relativePath := strings.TrimPrefix(*object.Key, s.getFilePath(folderPath))
+			if relativePath == "" {
+				continue
+			}
+
+			// Create the full local path
+			localPath := filepath.Join(tmpDir, relativePath)
+
+			// Create parent directories if they don't exist
+			if err := os.MkdirAll(filepath.Dir(localPath), 0755); err != nil {
+				os.RemoveAll(tmpDir) // Clean up on error
+				return "", fmt.Errorf("failed to create directory: %w", err)
+			}
+
+			// Download the file
+			result, err := s.client.GetObject(context.TODO(), &s3.GetObjectInput{
+				Bucket: aws.String(s.bucketName),
+				Key:    object.Key,
+			})
+			if err != nil {
+				os.RemoveAll(tmpDir) // Clean up on error
+				return "", fmt.Errorf("failed to get object %s: %w", *object.Key, err)
+			}
+
+			// Create the local file
+			localFile, err := os.Create(localPath)
+			if err != nil {
+				result.Body.Close()
+				os.RemoveAll(tmpDir) // Clean up on error
+				return "", fmt.Errorf("failed to create local file: %w", err)
+			}
+
+			// Copy the contents
+			if _, err := io.Copy(localFile, result.Body); err != nil {
+				localFile.Close()
+				result.Body.Close()
+				os.RemoveAll(tmpDir) // Clean up on error
+				return "", fmt.Errorf("failed to copy file contents: %w", err)
+			}
+
+			localFile.Close()
+			result.Body.Close()
+		}
+	}
+
+	return tmpDir, nil
+}

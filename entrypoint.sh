@@ -38,7 +38,7 @@ preflight_checks() {
     log "Running pre-flight checks..."
     
     # Check if required binaries exist
-    local required_bins=("photogrammetry")
+    local required_bins=("openmvgo")
     for bin in "${required_bins[@]}"; do
         if ! command -v "$bin" >/dev/null 2>&1; then
             error "Required binary not found: $bin"
